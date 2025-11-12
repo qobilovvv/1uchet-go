@@ -8,18 +8,20 @@ import (
 )
 
 type UserService interface {
-	CreateUser(phone_number string, password string) (*models.User, error)
+	Create(phone_number string, password string) (*models.User, error)
+	GetAll() ([]models.User, error)
+	GetByID(user_id uint) (*models.User, error)
 }
 
 type userService struct {
 	repo repositories.UserRepository
 }
 
-func NewUserService(repo repositories.UserRepository) UserService {
+func NewUserService(repo repositories.UserRepository) *userService {
 	return &userService{repo: repo}
 }
 
-func (s *userService) CreateUser(phone_number string, password string) (*models.User, error) {
+func (s *userService) Create(phone_number string, password string) (*models.User, error) {
 	existing, err := s.repo.FindByPhoneNumber(phone_number)
 	if err == nil && existing != nil {
 		return nil, errors.New("phone number already exists")
@@ -37,10 +39,10 @@ func (s *userService) CreateUser(phone_number string, password string) (*models.
 	return user, err
 }
 
-func (s *userService) GetAllUsers() ([]models.User, error) {
+func (s *userService) GetAll() ([]models.User, error) {
 	return s.repo.FindAll()
 }
 
-func (s *userService) GetUserByID(user_id uint) (*models.User, error) {
+func (s *userService) GetByID(user_id uint) (*models.User, error) {
 	return s.repo.GetByID(user_id)
 }
